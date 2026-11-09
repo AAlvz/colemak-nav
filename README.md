@@ -25,6 +25,25 @@ Hold **Alt+Shift** and use the right hand's inverted T to move between windows:
 Hold the modifiers and tap as many times as you like; let go and you are
 typing again. There is no mode to enter or leave.
 
+The keys around the inverted T switch buffers in the selected window:
+
+| Key (Colemak) | QWERTY | Command |
+|---------------|--------|---------|
+| `M-L` | `M-U` | `previous-buffer` |
+| `M-Y` | `M-P` | `next-buffer` |
+| `M-H` | `M-H` | `colemak-nav-last-buffer`: back to the buffer this window showed before; again to return |
+
+The last-buffer toggle needs no setup: every window already remembers what it
+showed, and switching updates that history, so pressing it twice brings you
+back. It uses the window's own history, so moving to another window and
+toggling does not drag the buffer you just left along.
+
+On QWERTY, next-buffer is `M-P` rather than `M-O`, because terminals send
+Meta+Shift+o as `ESC O`, the start of the arrow-key escape sequences. With the
+`positional` scheme `h` is an arrow, so the toggle moves to `j` (Colemak
+`M-J`). On Workman the right arrow itself would be `M-O`; colemak-nav warns
+instead of binding a key that cannot work in a terminal.
+
 `M-x colemak-nav-show-keys` prints the keys your settings produce.
 
 ## Why Meta+Shift
@@ -66,7 +85,7 @@ or with use-package:
 | `colemak-nav-layout` | `colemak` | `qwerty`, `colemak`, `colemak-dh`, `dvorak`, `workman` |
 | `colemak-nav-scheme` | `inverted-t` | `inverted-t`: the keys under QWERTY `i j k l` (up, left, down, right). `positional`: vim's QWERTY `h j k l` (left, down, up, right) |
 | `colemak-nav-modifiers` | `(meta shift)` | any of `control meta shift super hyper alt` |
-| `colemak-nav-enabled-groups` | `(windows)` | groups of keys to bind |
+| `colemak-nav-enabled-groups` | `(windows buffers)` | groups of keys to bind |
 
 Change them with `M-x customize-group RET colemak-nav`, or with `setopt`,
 and the keymap is rebuilt immediately:

@@ -13,3 +13,8 @@ All notable changes to colemak-nav. Versions follow [semver](https://semver.org)
 - Schemes: `inverted-t` and `positional` (vim's hjkl positions).
 - Configurable modifiers; the keymap rebuilds when an option changes.
 - `colemak-nav-show-keys`.
+- Buffers group: previous/next buffer on the keys around the up key
+  (Colemak `M-L` / `M-Y`), and `colemak-nav-last-buffer` on `M-H` to flip
+  between the two most recent buffers of the selected window.
+- Keys that would land on `M-O` (ESC O in terminals) fall back to another
+  position, or warn when they cannot.

@@ -38,6 +38,11 @@
 ;;   Colemak, Colemak-DH   M-U up   M-N left   M-E down   M-I right
 ;;   QWERTY                M-I up   M-J left   M-K down   M-L right
 ;;
+;; The keys around them switch buffers:
+;;
+;;   Colemak               M-L previous buffer   M-Y next buffer
+;;                         M-H back to the last buffer, again to return
+;;
 ;; Three options decide the keys:
 ;;
 ;;   `colemak-nav-layout'     the keyboard layout you type on
@@ -98,8 +103,20 @@ row, which colemak-nav does not use.")
   '((windows (up    . windmove-up)
              (left  . windmove-left)
              (down  . windmove-down)
-             (right . windmove-right)))
-  "Command for each direction, by group.")
+             (right . windmove-right))
+    (buffers (?u      . previous-buffer)
+             ((?o ?p) . next-buffer)
+             ((?h ?y) . colemak-nav-last-buffer)))
+  "Commands by group, each as (SLOT . COMMAND).
+SLOT is a direction of `colemak-nav-schemes', a QWERTY letter naming a
+fixed position, or a list of QWERTY letters to choose from: the first
+one the current scheme does not use as an arrow and whose key on the
+current layout is not in `colemak-nav--unsafe-keys'.")
+
+(defconst colemak-nav--unsafe-keys '(?o)
+  "Letters never bound with Meta, because terminals cannot deliver them.
+Meta+Shift+o is sent as ESC O, the start of the escape sequences of
+arrows and function keys.  See docs/gotchas.md.")
 
 ;;;; Options
 
@@ -138,9 +155,9 @@ terminals.  `super' is free too, but terminals do not send it."
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 
-(defcustom colemak-nav-enabled-groups '(windows)
+(defcustom colemak-nav-enabled-groups '(windows buffers)
   "Groups of keys to bind.  Each is an entry of `colemak-nav-groups'."
-  :type '(set (const windows))
+  :type '(set (const windows) (const buffers))
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 
@@ -157,6 +174,20 @@ Meta and Shift with a lower-case u."
             mods (remq 'shift mods)))
     (vector (event-convert-list (append mods (list char))))))
 
+(defun colemak-nav--position (slot scheme)
+  "Return the QWERTY letter for SLOT under SCHEME.
+See `colemak-nav-groups' for what SLOT can be."
+  (cond ((characterp slot) slot)
+        ((symbolp slot)
+         (or (alist-get slot scheme)
+             (error "Unknown colemak-nav direction: %s" slot)))
+        ((seq-find (lambda (c)
+                     (not (or (rassq c scheme)
+                              (memq (colemak-nav--translate c colemak-nav-layout)
+                                    colemak-nav--unsafe-keys))))
+                   slot))
+        (t (error "No free position among %S" slot))))
+
 (defun colemak-nav-bindings ()
   "Return the (KEY . COMMAND) pairs the current options produce."
   (let ((scheme (alist-get colemak-nav-scheme colemak-nav-schemes)))
@@ -165,7 +196,7 @@ Meta and Shift with a lower-case u."
     (mapcan
      (lambda (group)
        (mapcar (lambda (entry)
-                 (let ((pos (alist-get (car entry) scheme)))
+                 (let ((pos (colemak-nav--position (car entry) scheme)))
                    (cons (colemak-nav--key
                           (colemak-nav--translate pos colemak-nav-layout)
                           colemak-nav-modifiers)
@@ -179,9 +210,32 @@ Meta and Shift with a lower-case u."
 The keymap object is kept, so an enabled mode picks up the change."
   (setcdr colemak-nav-mode-map nil)
   (pcase-dolist (`(,key . ,command) (colemak-nav-bindings))
+    ;; A terminal sends Meta as ESC, and ESC O / ESC [ start the escape
+    ;; sequences of arrows and function keys: Emacs would wait for the
+    ;; rest of a sequence that never comes.  See docs/gotchas.md.
+    (when (member key (list (kbd "M-O") (kbd "M-[")))
+      (display-warning 'colemak-nav
+                       (format "%s does not work in text terminals (%s)"
+                               (key-description key) command)))
     (define-key colemak-nav-mode-map key command)))
 
 (colemak-nav--rebuild)
+
+;;;; Commands
+
+(defun colemak-nav-last-buffer ()
+  "Switch to the buffer this window showed before the current one.
+Calling it again switches back, so two buffers can be flipped between.
+The history is the selected window's own, the same one `previous-buffer'
+walks, so moving to another window does not bring its buffer along."
+  (interactive)
+  (let ((entry (seq-find (lambda (e)
+                           (and (buffer-live-p (car e))
+                                (not (eq (car e) (current-buffer)))))
+                         (window-prev-buffers))))
+    (if entry
+        (switch-to-buffer (car entry))
+      (user-error "No previous buffer in this window"))))
 
 ;;;; Mode
 

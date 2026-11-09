@@ -13,9 +13,10 @@
   "Run BODY with the options in BINDINGS, then restore the keymap."
   (declare (indent 1))
   `(unwind-protect
-       (let ,bindings
-         (colemak-nav--rebuild)
-         ,@body)
+       (let ((colemak-nav-enabled-groups '(windows)))
+         (let ,bindings
+           (colemak-nav--rebuild)
+           ,@body))
      (colemak-nav--rebuild)))
 
 (defun colemak-nav-test--keys ()
@@ -31,6 +32,7 @@
 
 (ert-deftest colemak-nav-test-colemak-inverted-t ()
   (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-enabled-groups '(windows))
                            (colemak-nav-scheme 'inverted-t)
                            (colemak-nav-modifiers '(meta shift)))
     (should (equal (colemak-nav-test--keys)
@@ -101,6 +103,87 @@
               (execute-kbd-macro (kbd "M-N"))
               (should (eq (selected-window) left)))
           (colemak-nav-mode -1))))))
+
+;;;; Buffers
+
+(ert-deftest colemak-nav-test-buffers-colemak ()
+  "Colemak: l and y around the up key, h for the last buffer."
+  (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-scheme 'inverted-t)
+                           (colemak-nav-enabled-groups '(buffers)))
+    (should (equal (colemak-nav-test--keys)
+                   '(("M-L" . previous-buffer) ("M-Y" . next-buffer)
+                     ("M-H" . colemak-nav-last-buffer))))))
+
+(ert-deftest colemak-nav-test-buffers-positional-moves-toggle ()
+  "Under vim positions h is an arrow, so the toggle falls back to j."
+  (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-scheme 'positional)
+                           (colemak-nav-enabled-groups '(windows buffers)))
+    (let ((keys (colemak-nav-test--keys)))
+      (should (equal (car (rassq 'colemak-nav-last-buffer keys)) "M-J"))
+      (should (eq (cdr (assoc "M-H" keys)) 'windmove-left))
+      ;; No key is bound twice.
+      (should (= (length keys) (length (delete-dups (mapcar #'car keys))))))))
+
+(ert-deftest colemak-nav-test-no-duplicate-keys ()
+  "No layout and scheme bind the same key twice."
+  (dolist (layout (mapcar #'car colemak-nav-layouts))
+    (dolist (scheme (mapcar #'car colemak-nav-schemes))
+      (colemak-nav-test--with ((colemak-nav-layout layout)
+                               (colemak-nav-scheme scheme)
+                               (colemak-nav-enabled-groups '(windows buffers)))
+        (let ((keys (mapcar #'car (colemak-nav-test--keys))))
+          (should (= (length keys) (length (delete-dups (copy-sequence keys))))))))))
+
+(ert-deftest colemak-nav-test-last-buffer-toggles ()
+  "The toggle flips between the two most recent buffers of the window."
+  (save-window-excursion
+    (let ((a (get-buffer-create "*cn-a*"))
+          (b (get-buffer-create "*cn-b*"))
+          (c (get-buffer-create "*cn-c*")))
+      (unwind-protect
+          (progn
+            (delete-other-windows)
+            (set-window-prev-buffers nil nil)
+            (switch-to-buffer a)
+            (switch-to-buffer b)
+            (switch-to-buffer c)
+            (colemak-nav-last-buffer)
+            (should (eq (current-buffer) b))
+            (colemak-nav-last-buffer)
+            (should (eq (current-buffer) c))
+            (colemak-nav-last-buffer)
+            (should (eq (current-buffer) b)))
+        (mapc #'kill-buffer (list a b c))))))
+
+(ert-deftest colemak-nav-test-last-buffer-is-per-window ()
+  "Each window flips through its own history.
+Window 1 shows a then b; window 2 then shows x.  Globally x is the most
+recent buffer, but window 1 must go back to a."
+  (save-window-excursion
+    (let ((a (get-buffer-create "*cn-a*"))
+          (b (get-buffer-create "*cn-b*"))
+          (x (get-buffer-create "*cn-x*")))
+      (unwind-protect
+          (progn
+            (delete-other-windows)
+            (set-window-prev-buffers nil nil)
+            (switch-to-buffer a)
+            (switch-to-buffer b)
+            (let ((one (selected-window)))
+              (select-window (split-window-right))
+              (switch-to-buffer x)
+              (select-window one)
+              (colemak-nav-last-buffer)
+              (should (eq (current-buffer) a))))
+        (mapc #'kill-buffer (list a b x))))))
+
+(ert-deftest colemak-nav-test-qwerty-avoids-meta-o ()
+  "On QWERTY the next-buffer key skips o (ESC O trap) and uses p."
+  (colemak-nav-test--with ((colemak-nav-layout 'qwerty)
+                           (colemak-nav-enabled-groups '(buffers)))
+    (should (equal (car (rassq 'next-buffer (colemak-nav-test--keys))) "M-P"))))
 
 (provide 'colemak-nav-test)
 ;;; colemak-nav-test.el ends here
