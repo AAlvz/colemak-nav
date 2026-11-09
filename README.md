@@ -87,6 +87,12 @@ Bindings are written once against QWERTY and translated by position, so
 adding a layout is one line in `colemak-nav-layouts`. The idea comes from
 [xah-fly-keys](https://github.com/xahlee/xah-fly-keys).
 
+## Gotchas
+
+What the layout setting really means (the letters Emacs receives, not your OS
+layout), why `M-O` can never be bound in a terminal, and other traps:
+[docs/gotchas.md](docs/gotchas.md).
+
 ## Development
 
 ```sh
