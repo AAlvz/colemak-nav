@@ -124,6 +124,8 @@ What the layout setting really means (the letters Emacs receives, not your OS
 layout), why `M-O` can never be bound in a terminal, and other traps:
 [docs/gotchas.md](docs/gotchas.md).
 
+What might come next: [docs/roadmap.md](docs/roadmap.md).
+
 ## Development
 
 ```sh

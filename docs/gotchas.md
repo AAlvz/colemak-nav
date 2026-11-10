@@ -39,6 +39,15 @@ Related: when `M-U` is unbound, Emacs falls back to `M-u`. Binding `M-U`
 removes that fallback, which in stock Emacs means Alt+Shift+u no longer runs
 `upcase-word`.
 
+## Shift on punctuation is another character
+
+Shift does not just upper-case punctuation keys, it turns them into other
+characters: Alt+Shift+`,` arrives as `M-<` and Alt+Shift+`.` as `M->`, which
+are beginning and end of buffer (and first/last candidate in vertico and the
+minibuffer). Alt+Shift+`;` is `M-:`, `eval-expression`. So with Meta+Shift
+only the letter keys are really free; this is why the tabs group sits on
+Colemak `k m` instead of the keys right below `n e i`.
+
 ## Terminals send Meta as ESC, and some ESC pairs start escape sequences
 
 In a text terminal, Alt+x is sent as `ESC x`. Two of those pairs are also how
