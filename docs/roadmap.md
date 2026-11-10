@@ -8,8 +8,7 @@ Ideas waiting for real use to decide them. Nothing here is promised.
   shortcuts (Alt+Shift+D duplicates a pane, Alt+Shift+arrows resize panes).
   None should collide with the letters colemak-nav uses, but it has not been
   checked.
-- **Release 0.1.0.** Tag it so the changelog stops saying "unreleased". MELPA
-  later, once the keys have settled.
+- **MELPA**, once the keys have settled. (0.1.0 is released on GitHub.)
 
 ## Ideas
 
