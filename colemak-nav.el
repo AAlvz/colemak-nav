@@ -43,6 +43,10 @@
 ;;   Colemak               M-L previous buffer   M-Y next buffer
 ;;                         M-H back to the last buffer, again to return
 ;;
+;; The two keys below the left arrow switch tabs (`tab-bar-mode'):
+;;
+;;   Colemak               M-K previous tab   M-M next tab
+;;
 ;; Three options decide the keys:
 ;;
 ;;   `colemak-nav-layout'     the keyboard layout you type on
@@ -106,7 +110,9 @@ row, which colemak-nav does not use.")
              (right . windmove-right))
     (buffers (?u      . previous-buffer)
              ((?o ?p) . next-buffer)
-             ((?h ?y) . colemak-nav-last-buffer)))
+             ((?h ?y) . colemak-nav-last-buffer))
+    (tabs (?n . tab-previous)
+          (?m . tab-next)))
   "Commands by group, each as (SLOT . COMMAND).
 SLOT is a direction of `colemak-nav-schemes', a QWERTY letter naming a
 fixed position, or a list of QWERTY letters to choose from: the first
@@ -155,9 +161,9 @@ terminals.  `super' is free too, but terminals do not send it."
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 
-(defcustom colemak-nav-enabled-groups '(windows buffers)
+(defcustom colemak-nav-enabled-groups '(windows buffers tabs)
   "Groups of keys to bind.  Each is an entry of `colemak-nav-groups'."
-  :type '(set (const windows) (const buffers))
+  :type '(set (const windows) (const buffers) (const tabs))
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 

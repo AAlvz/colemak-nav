@@ -104,6 +104,32 @@
               (should (eq (selected-window) left)))
           (colemak-nav-mode -1))))))
 
+;;;; Tabs
+
+(ert-deftest colemak-nav-test-tabs-colemak ()
+  "Colemak: k and m, the bottom-row keys below h and n."
+  (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-enabled-groups '(tabs)))
+    (should (equal (colemak-nav-test--keys)
+                   '(("M-K" . tab-previous) ("M-M" . tab-next))))))
+
+(ert-deftest colemak-nav-test-tabs-switch ()
+  "The tab keys move between tabs."
+  (let ((tab-bar-new-tab-choice "*scratch*"))
+    (unwind-protect
+        (progn
+          (tab-bar-mode 1)
+          (tab-bar-new-tab)
+          (tab-bar-new-tab)
+          (tab-bar-select-tab 2)
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-M")))
+          (should (= 2 (tab-bar--current-tab-index)))
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-K")))
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-K")))
+          (should (= 0 (tab-bar--current-tab-index))))
+      (tab-bar-close-other-tabs)
+      (tab-bar-mode -1))))
+
 ;;;; Buffers
 
 (ert-deftest colemak-nav-test-buffers-colemak ()
@@ -132,7 +158,7 @@
     (dolist (scheme (mapcar #'car colemak-nav-schemes))
       (colemak-nav-test--with ((colemak-nav-layout layout)
                                (colemak-nav-scheme scheme)
-                               (colemak-nav-enabled-groups '(windows buffers)))
+                               (colemak-nav-enabled-groups '(windows buffers tabs)))
         (let ((keys (mapcar #'car (colemak-nav-test--keys))))
           (should (= (length keys) (length (delete-dups (copy-sequence keys))))))))))
 

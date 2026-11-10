@@ -16,5 +16,7 @@ All notable changes to colemak-nav. Versions follow [semver](https://semver.org)
 - Buffers group: previous/next buffer on the keys around the up key
   (Colemak `M-L` / `M-Y`), and `colemak-nav-last-buffer` on `M-H` to flip
   between the two most recent buffers of the selected window.
+- Tabs group: previous/next tab on the two bottom-row keys below the left
+  arrow (Colemak `M-K` / `M-M`).
 - Keys that would land on `M-O` (ESC O in terminals) fall back to another
   position, or warn when they cannot.

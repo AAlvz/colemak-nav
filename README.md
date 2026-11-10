@@ -44,6 +44,18 @@ Meta+Shift+o as `ESC O`, the start of the arrow-key escape sequences. With the
 `M-J`). On Workman the right arrow itself would be `M-O`; colemak-nav warns
 instead of binding a key that cannot work in a terminal.
 
+The two keys below the left arrow switch tabs (`tab-bar-mode`):
+
+| Key (Colemak) | QWERTY | Command |
+|---------------|--------|---------|
+| `M-K` | `M-N` | `tab-previous` |
+| `M-M` | `M-M` | `tab-next` |
+
+So each row has one job: top row buffers, home row windows, bottom row
+tabs. The keys right below `n e i` would be `M-M`, `M-<` and `M->`, but
+Shift turns `,` and `.` into `<` and `>`, and `M-<` / `M->` are the
+beginning and end of the buffer, so the pair sits one key to the left.
+
 `M-x colemak-nav-show-keys` prints the keys your settings produce.
 
 ## Why Meta+Shift
@@ -85,7 +97,7 @@ or with use-package:
 | `colemak-nav-layout` | `colemak` | `qwerty`, `colemak`, `colemak-dh`, `dvorak`, `workman` |
 | `colemak-nav-scheme` | `inverted-t` | `inverted-t`: the keys under QWERTY `i j k l` (up, left, down, right). `positional`: vim's QWERTY `h j k l` (left, down, up, right) |
 | `colemak-nav-modifiers` | `(meta shift)` | any of `control meta shift super hyper alt` |
-| `colemak-nav-enabled-groups` | `(windows buffers)` | groups of keys to bind |
+| `colemak-nav-enabled-groups` | `(windows buffers tabs)` | groups of keys to bind |
 
 Change them with `M-x customize-group RET colemak-nav`, or with `setopt`,
 and the keymap is rebuilt immediately:
