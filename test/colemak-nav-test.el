@@ -36,33 +36,34 @@
                            (colemak-nav-scheme 'inverted-t)
                            (colemak-nav-modifiers '(meta shift)))
     (should (equal (colemak-nav-test--keys)
-                   '(("M-U" . windmove-up) ("M-N" . windmove-left)
-                     ("M-E" . windmove-down) ("M-I" . windmove-right))))))
+                   '(("M-U" . windmove-up) ("M-K" . windmove-left)
+                     ("M-E" . windmove-down) ("M-M" . windmove-right))))))
 
 (ert-deftest colemak-nav-test-colemak-dh-same-as-colemak ()
-  "The inverted T does not move on Colemak-DH."
+  "Same physical keys on Colemak-DH; its bottom row has k h where Colemak has k m."
   (colemak-nav-test--with ((colemak-nav-layout 'colemak-dh)
                            (colemak-nav-scheme 'inverted-t))
     (should (equal (mapcar #'car (colemak-nav-test--keys))
-                   '("M-U" "M-N" "M-E" "M-I")))))
+                   '("M-U" "M-K" "M-E" "M-H")))))
 
 (ert-deftest colemak-nav-test-qwerty ()
   (colemak-nav-test--with ((colemak-nav-layout 'qwerty)
                            (colemak-nav-scheme 'inverted-t))
     (should (equal (mapcar #'car (colemak-nav-test--keys))
-                   '("M-I" "M-J" "M-K" "M-L")))))
+                   '("M-I" "M-N" "M-K" "M-M")))))
 
 (ert-deftest colemak-nav-test-positional ()
-  "Vim positions: h n e i on Colemak, m n e i on Colemak-DH."
+  "Vim positions move up and down; left and right stay on the bottom row."
   (colemak-nav-test--with ((colemak-nav-layout 'colemak)
                            (colemak-nav-scheme 'positional))
     (should (equal (colemak-nav-test--keys)
-                   '(("M-E" . windmove-up) ("M-H" . windmove-left)
-                     ("M-N" . windmove-down) ("M-I" . windmove-right)))))
-  (colemak-nav-test--with ((colemak-nav-layout 'colemak-dh)
-                           (colemak-nav-scheme 'positional))
-    (should (equal (car (rassq 'windmove-left (colemak-nav-test--keys)))
-                   "M-M"))))
+                   '(("M-E" . windmove-up) ("M-K" . windmove-left)
+                     ("M-N" . windmove-down) ("M-M" . windmove-right)))))
+  (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-scheme 'positional)
+                           (colemak-nav-enabled-groups '(tabs)))
+    (should (equal (colemak-nav-test--keys)
+                   '(("M-H" . tab-previous) ("M-I" . tab-next))))))
 
 (ert-deftest colemak-nav-test-modifiers ()
   "Without Shift the key stays lower case; Super works too."
@@ -78,18 +79,18 @@
 (ert-deftest colemak-nav-test-keymap-follows-options ()
   "The mode's keymap is rebuilt in place when an option changes."
   (colemak-nav-test--with ((colemak-nav-layout 'colemak))
-    (should (eq (lookup-key colemak-nav-mode-map (kbd "M-N")) 'windmove-left))
+    (should (eq (lookup-key colemak-nav-mode-map (kbd "M-K")) 'windmove-left))
     (let ((colemak-nav-layout 'qwerty))
       (colemak-nav--rebuild)
-      (should (eq (lookup-key colemak-nav-mode-map (kbd "M-J")) 'windmove-left))
-      (should-not (lookup-key colemak-nav-mode-map (kbd "M-N"))))))
+      (should (eq (lookup-key colemak-nav-mode-map (kbd "M-N")) 'windmove-left))
+      (should (eq (lookup-key colemak-nav-mode-map (kbd "M-K")) 'windmove-down)))))
 
 (ert-deftest colemak-nav-test-unknown-layout ()
   (let ((colemak-nav-layout 'azerty))
     (should-error (colemak-nav-bindings))))
 
 (ert-deftest colemak-nav-test-moves-windows ()
-  "M-I moves to the window on the right in a real split."
+  "M-M moves to the window on the right in a real split."
   (colemak-nav-test--with ((colemak-nav-layout 'colemak))
     (save-window-excursion
       (delete-other-windows)
@@ -98,20 +99,34 @@
         (colemak-nav-mode 1)
         (unwind-protect
             (progn
-              (execute-kbd-macro (kbd "M-I"))
+              (execute-kbd-macro (kbd "M-M"))
               (should (eq (selected-window) right))
-              (execute-kbd-macro (kbd "M-N"))
+              (execute-kbd-macro (kbd "M-K"))
               (should (eq (selected-window) left)))
           (colemak-nav-mode -1))))))
+
+;;;; Left-hand windows
+
+(ert-deftest colemak-nav-test-windows-left-hand ()
+  "The inverted T mirrored on the left hand, without down: f r t on Colemak."
+  (colemak-nav-test--with ((colemak-nav-layout 'colemak)
+                           (colemak-nav-enabled-groups '(windows-left-hand)))
+    (should (equal (colemak-nav-test--keys)
+                   '(("M-F" . windmove-up) ("M-R" . windmove-left)
+                     ("M-T" . windmove-right)))))
+  (colemak-nav-test--with ((colemak-nav-layout 'qwerty)
+                           (colemak-nav-enabled-groups '(windows-left-hand)))
+    (should (equal (mapcar #'car (colemak-nav-test--keys))
+                   '("M-E" "M-S" "M-F")))))
 
 ;;;; Tabs
 
 (ert-deftest colemak-nav-test-tabs-colemak ()
-  "Colemak: k and m, the bottom-row keys below h and n."
+  "Colemak: n and i, the home-row left and right arrows."
   (colemak-nav-test--with ((colemak-nav-layout 'colemak)
                            (colemak-nav-enabled-groups '(tabs)))
     (should (equal (colemak-nav-test--keys)
-                   '(("M-K" . tab-previous) ("M-M" . tab-next))))))
+                   '(("M-N" . tab-previous) ("M-I" . tab-next))))))
 
 (ert-deftest colemak-nav-test-tabs-switch ()
   "The tab keys move between tabs."
@@ -122,10 +137,10 @@
           (tab-bar-new-tab)
           (tab-bar-new-tab)
           (tab-bar-select-tab 2)
-          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-M")))
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-I")))
           (should (= 2 (tab-bar--current-tab-index)))
-          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-K")))
-          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-K")))
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-N")))
+          (call-interactively (lookup-key colemak-nav-mode-map (kbd "M-N")))
           (should (= 0 (tab-bar--current-tab-index))))
       (tab-bar-close-other-tabs)
       (tab-bar-mode -1))))
@@ -148,7 +163,7 @@
                            (colemak-nav-enabled-groups '(windows buffers)))
     (let ((keys (colemak-nav-test--keys)))
       (should (equal (car (rassq 'colemak-nav-last-buffer keys)) "M-J"))
-      (should (eq (cdr (assoc "M-H" keys)) 'windmove-left))
+      (should (eq (cdr (assoc "M-K" keys)) 'windmove-left))
       ;; No key is bound twice.
       (should (= (length keys) (length (delete-dups (mapcar #'car keys))))))))
 
@@ -158,7 +173,7 @@
     (dolist (scheme (mapcar #'car colemak-nav-schemes))
       (colemak-nav-test--with ((colemak-nav-layout layout)
                                (colemak-nav-scheme scheme)
-                               (colemak-nav-enabled-groups '(windows buffers tabs)))
+                               (colemak-nav-enabled-groups '(windows windows-left-hand buffers tabs)))
         (let ((keys (mapcar #'car (colemak-nav-test--keys))))
           (should (= (length keys) (length (delete-dups (copy-sequence keys))))))))))
 

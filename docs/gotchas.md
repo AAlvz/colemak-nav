@@ -45,7 +45,7 @@ Shift does not just upper-case punctuation keys, it turns them into other
 characters: Alt+Shift+`,` arrives as `M-<` and Alt+Shift+`.` as `M->`, which
 are beginning and end of buffer (and first/last candidate in vertico and the
 minibuffer). Alt+Shift+`;` is `M-:`, `eval-expression`. So with Meta+Shift
-only the letter keys are really free; this is why the tabs group sits on
+only the letter keys are really free; this is why window left/right sit on
 Colemak `k m` instead of the keys right below `n e i`.
 
 ## Terminals send Meta as ESC, and some ESC pairs start escape sequences

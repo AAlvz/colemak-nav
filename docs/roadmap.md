@@ -8,6 +8,9 @@ Ideas waiting for real use to decide them. Nothing here is promised.
   shortcuts (Alt+Shift+D duplicates a pane, Alt+Shift+arrows resize panes).
   None should collide with the letters colemak-nav uses, but it has not been
   checked.
+- **Dvorak and the left-hand keys.** `windows-left-hand` lands on `M-O` and
+  on the `.` key there. Leave the group off by default on Dvorak, or give it
+  fallback positions.
 - **MELPA**, once the keys have settled. (0.1.0 is released on GitHub.)
 
 ## Ideas
@@ -26,6 +29,6 @@ Ideas waiting for real use to decide them. Nothing here is promised.
 
 - **A word-selection key** (Meta+Shift+t for an improved `mark-word`).
   `M-@` is close enough and needs no new key.
-- **Tabs on the keys right below `n e i`.** With Shift those are `M-M`,
+- **Anything on the keys right below `n e i`.** With Shift those are `M-M`,
   `M-<` and `M->`; the last two are beginning and end of buffer. See
   [gotchas](gotchas.md#shift-on-punctuation-is-another-character).

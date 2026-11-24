@@ -32,25 +32,21 @@
 ;; Emacs leaves free, so the default bindings keep working.
 ;;
 ;; Keys are defined by where they sit on the keyboard, not by the letter
-;; printed on them.  With the default settings, holding Alt+Shift and
-;; tapping the right hand's inverted T moves between windows:
+;; printed on them.  With the default settings, hold Alt+Shift and tap:
 ;;
-;;   Colemak, Colemak-DH   M-U up   M-N left   M-E down   M-I right
-;;   QWERTY                M-I up   M-J left   M-K down   M-L right
-;;
-;; The keys around them switch buffers:
-;;
-;;   Colemak               M-L previous buffer   M-Y next buffer
-;;                         M-H back to the last buffer, again to return
-;;
-;; The two keys below the left arrow switch tabs (`tab-bar-mode'):
-;;
-;;   Colemak               M-K previous tab   M-M next tab
+;;   Windows    Colemak   M-U up   M-K left   M-E down   M-M right
+;;              QWERTY    M-I up   M-N left   M-K down   M-M right
+;;   Left hand  Colemak   M-F up   M-R left   M-T right
+;;              QWERTY    M-E up   M-S left   M-F right
+;;   Tabs       Colemak   M-N previous tab   M-I next tab
+;;              QWERTY    M-J previous tab   M-L next tab
+;;   Buffers    Colemak   M-L previous buffer   M-Y next buffer
+;;                        M-H back to the last buffer, again to return
 ;;
 ;; Three options decide the keys:
 ;;
 ;;   `colemak-nav-layout'     the keyboard layout you type on
-;;   `colemak-nav-scheme'     which physical keys are the arrows:
+;;   `colemak-nav-scheme'     which home-row keys are the arrows:
 ;;                            `inverted-t' (QWERTY i j k l) or
 ;;                            `positional' (vim's QWERTY h j k l)
 ;;   `colemak-nav-modifiers'  the modifiers held, by default Meta+Shift
@@ -104,15 +100,21 @@ row, which colemak-nav does not use.")
   "Direction to physical key, written as the QWERTY letter in that spot.")
 
 (defconst colemak-nav-groups
-  '((windows (up    . windmove-up)
-             (left  . windmove-left)
-             (down  . windmove-down)
-             (right . windmove-right))
+  '((windows (up   . windmove-up)
+             (?n   . windmove-left)
+             (down . windmove-down)
+             (?m   . windmove-right))
+    ;; The inverted T mirrored onto the left hand (QWERTY e s f), so
+    ;; windows can be reached without the right hand.  No down key: d
+    ;; (Colemak s) is left free, and down stays on the right hand.
+    (windows-left-hand (?e . windmove-up)
+                       (?s . windmove-left)
+                       (?f . windmove-right))
     (buffers (?u      . previous-buffer)
              ((?o ?p) . next-buffer)
              ((?h ?y) . colemak-nav-last-buffer))
-    (tabs (?n . tab-previous)
-          (?m . tab-next)))
+    (tabs (left  . tab-previous)
+          (right . tab-next)))
   "Commands by group, each as (SLOT . COMMAND).
 SLOT is a direction of `colemak-nav-schemes', a QWERTY letter naming a
 fixed position, or a list of QWERTY letters to choose from: the first
@@ -161,9 +163,10 @@ terminals.  `super' is free too, but terminals do not send it."
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 
-(defcustom colemak-nav-enabled-groups '(windows buffers tabs)
+(defcustom colemak-nav-enabled-groups '(windows windows-left-hand buffers tabs)
   "Groups of keys to bind.  Each is an entry of `colemak-nav-groups'."
-  :type '(set (const windows) (const buffers) (const tabs))
+  :type '(set (const windows) (const windows-left-hand)
+              (const buffers) (const tabs))
   :set #'colemak-nav--set
   :initialize #'custom-initialize-default)
 

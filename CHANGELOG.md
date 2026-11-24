@@ -2,6 +2,20 @@
 
 All notable changes to colemak-nav. Versions follow [semver](https://semver.org).
 
+## Unreleased
+
+### Changed
+
+- Tabs moved to the home-row left/right arrows (Colemak `M-N` / `M-I`).
+- Window left/right moved to the bottom row (Colemak `M-K` / `M-M`); up and
+  down stay on the inverted T.
+
+### Added
+
+- `windows-left-hand` group, on by default: the inverted T mirrored onto
+  the left hand (Colemak `M-F` up, `M-R` left, `M-T` right). It has no down
+  key, so the middle key stays free.
+
 ## 0.1.0 — 2026-11-10
 
 ### Added

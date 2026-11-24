@@ -13,19 +13,47 @@ Colemak, Colemak-DH, QWERTY, Dvorak or Workman.
 
 ## Keys
 
-Hold **Alt+Shift** and use the right hand's inverted T to move between windows:
+Hold **Alt+Shift** and tap as many times as you like. Let go and you are
+typing again; there is no mode to enter or leave.
+
+### Windows
+
+Up and down are the right hand's inverted T. Left and right sit on the
+bottom row, below `h n`:
+
+| Direction | Colemak | Colemak-DH | QWERTY | Command |
+|-----------|---------|------------|--------|---------|
+| up        | `M-U`   | `M-U`      | `M-I`  | `windmove-up` |
+| left      | `M-K`   | `M-K`      | `M-N`  | `windmove-left` |
+| down      | `M-E`   | `M-E`      | `M-K`  | `windmove-down` |
+| right     | `M-M`   | `M-H`      | `M-M`  | `windmove-right` |
+
+The same keys mirrored onto the left hand (QWERTY `e s f`), so windows can
+be reached without lifting the right hand:
 
 | Direction | Colemak / Colemak-DH | QWERTY | Command |
 |-----------|----------------------|--------|---------|
-| up        | `M-U`                | `M-I`  | `windmove-up` |
-| left      | `M-N`                | `M-J`  | `windmove-left` |
-| down      | `M-E`                | `M-K`  | `windmove-down` |
-| right     | `M-I`                | `M-L`  | `windmove-right` |
+| up        | `M-F`                | `M-E`  | `windmove-up` |
+| left      | `M-R`                | `M-S`  | `windmove-left` |
+| right     | `M-T`                | `M-F`  | `windmove-right` |
 
-Hold the modifiers and tap as many times as you like; let go and you are
-typing again. There is no mode to enter or leave.
+The left hand has no down key: the middle key stays free (it is a common
+place for a personal binding), and down is one key away on the right hand.
+Turn the left-hand keys off by removing `windows-left-hand` from
+`colemak-nav-enabled-groups`.
 
-The keys around the inverted T switch buffers in the selected window:
+### Tabs
+
+The home-row left and right arrows switch tabs (`tab-bar-mode`):
+
+| Key (Colemak) | QWERTY | Command |
+|---------------|--------|---------|
+| `M-N` | `M-J` | `tab-previous` |
+| `M-I` | `M-L` | `tab-next` |
+
+### Buffers
+
+The keys around the up key switch buffers in the selected window:
 
 | Key (Colemak) | QWERTY | Command |
 |---------------|--------|---------|
@@ -41,20 +69,14 @@ toggling does not drag the buffer you just left along.
 On QWERTY, next-buffer is `M-P` rather than `M-O`, because terminals send
 Meta+Shift+o as `ESC O`, the start of the arrow-key escape sequences. With the
 `positional` scheme `h` is an arrow, so the toggle moves to `j` (Colemak
-`M-J`). On Workman the right arrow itself would be `M-O`; colemak-nav warns
-instead of binding a key that cannot work in a terminal.
+`M-J`). On Workman next-tab would be `M-O`, and on Dvorak the left-hand
+keys land on `M-O` and on `.`; colemak-nav warns about `M-O` instead of
+binding a key that cannot work in a terminal. Dvorak users should drop
+`windows-left-hand`.
 
-The two keys below the left arrow switch tabs (`tab-bar-mode`):
-
-| Key (Colemak) | QWERTY | Command |
-|---------------|--------|---------|
-| `M-K` | `M-N` | `tab-previous` |
-| `M-M` | `M-M` | `tab-next` |
-
-So each row has one job: top row buffers, home row windows, bottom row
-tabs. The keys right below `n e i` would be `M-M`, `M-<` and `M->`, but
-Shift turns `,` and `.` into `<` and `>`, and `M-<` / `M->` are the
-beginning and end of the buffer, so the pair sits one key to the left.
+The keys right below `n e i` would be `M-M`, `M-<` and `M->`, but Shift
+turns `,` and `.` into `<` and `>`, and `M-<` / `M->` are the beginning and
+end of the buffer, so the bottom-row pair sits one key to the left.
 
 `M-x colemak-nav-show-keys` prints the keys your settings produce.
 
@@ -97,18 +119,19 @@ or with use-package:
 | `colemak-nav-layout` | `colemak` | `qwerty`, `colemak`, `colemak-dh`, `dvorak`, `workman` |
 | `colemak-nav-scheme` | `inverted-t` | `inverted-t`: the keys under QWERTY `i j k l` (up, left, down, right). `positional`: vim's QWERTY `h j k l` (left, down, up, right) |
 | `colemak-nav-modifiers` | `(meta shift)` | any of `control meta shift super hyper alt` |
-| `colemak-nav-enabled-groups` | `(windows buffers tabs)` | groups of keys to bind |
+| `colemak-nav-enabled-groups` | `(windows windows-left-hand buffers tabs)` | groups of keys to bind |
 
 Change them with `M-x customize-group RET colemak-nav`, or with `setopt`,
 and the keymap is rebuilt immediately:
 
 ```elisp
 (setopt colemak-nav-layout 'colemak-dh
-        colemak-nav-scheme 'positional)   ; M-M M-N M-E M-I
+        colemak-nav-scheme 'positional)   ; up M-E, down M-N, tabs M-M M-I
 ```
 
-Both schemes have their followers. `inverted-t` matches arrow keys and
-Colemak's Extend layer, and does not move on Colemak-DH. `positional` keeps
+The scheme picks the home-row arrows: window up and down, and the tab keys
+for left and right. Window left and right stay on the bottom row in both.
+`inverted-t` matches arrow keys and Colemak's Extend layer. `positional` keeps
 vim's `hjkl` muscle memory (`h n e i` on Colemak, `m n e i` on Colemak-DH).
 
 ## How layouts work
